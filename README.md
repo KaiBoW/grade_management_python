@@ -94,12 +94,14 @@ student_management/
 如果这个项目对您有帮助，欢迎打赏一杯咖啡：
 
 <p align="center">
-  <img src="docs/images/alipay.jpg" alt="支付宝" width="200" height="200" style="margin-right: 20px;"/>
-  <img src="docs/images/wechat_pay.jpg" alt="微信支付" width="200" height="200"/>
-</p>
-<p align="center">
-  <span style="margin-right: 120px;">支付宝</span>
-  <span>微信支付</span>
+  <div style="display: inline-block; text-align: center; margin-right: 20px;">
+    <img src="docs/images/alipay.jpg" alt="支付宝" width="200" height="200"/>
+    <p>支付宝</p>
+  </div>
+  <div style="display: inline-block; text-align: center;">
+    <img src="docs/images/wechat_pay.jpg" alt="微信支付" width="200" height="200"/>
+    <p>微信支付</p>
+  </div>
 </p>
 
 ## 📝 许可证
