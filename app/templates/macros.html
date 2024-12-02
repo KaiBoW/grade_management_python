@@ -1,0 +1,52 @@
+{% macro render_pagination(pagination, endpoint, class_id=none, exam_date=none) %}
+<nav aria-label="Page navigation">
+    <ul class="pagination justify-content-center">
+        {% if pagination.has_prev %}
+        <li class="page-item">
+            {% set url_args = {'page': pagination.prev_num} %}
+            {% if class_id %}{% set _ = url_args.update({'class_id': class_id}) %}{% endif %}
+            {% if exam_date %}{% set _ = url_args.update({'exam_date': exam_date}) %}{% endif %}
+            <a class="page-link" href="{{ url_for(endpoint, **url_args) }}">上一页</a>
+        </li>
+        {% else %}
+        <li class="page-item disabled">
+            <span class="page-link">上一页</span>
+        </li>
+        {% endif %}
+
+        {% for page in pagination.iter_pages() %}
+            {% if page %}
+                {% if page != pagination.page %}
+                <li class="page-item">
+                    {% set url_args = {'page': page} %}
+                    {% if class_id %}{% set _ = url_args.update({'class_id': class_id}) %}{% endif %}
+                    {% if exam_date %}{% set _ = url_args.update({'exam_date': exam_date}) %}{% endif %}
+                    <a class="page-link" href="{{ url_for(endpoint, **url_args) }}">{{ page }}</a>
+                </li>
+                {% else %}
+                <li class="page-item active">
+                    <span class="page-link">{{ page }}</span>
+                </li>
+                {% endif %}
+            {% else %}
+                <li class="page-item disabled">
+                    <span class="page-link">...</span>
+                </li>
+            {% endif %}
+        {% endfor %}
+
+        {% if pagination.has_next %}
+        <li class="page-item">
+            {% set url_args = {'page': pagination.next_num} %}
+            {% if class_id %}{% set _ = url_args.update({'class_id': class_id}) %}{% endif %}
+            {% if exam_date %}{% set _ = url_args.update({'exam_date': exam_date}) %}{% endif %}
+            <a class="page-link" href="{{ url_for(endpoint, **url_args) }}">下一页</a>
+        </li>
+        {% else %}
+        <li class="page-item disabled">
+            <span class="page-link">下一页</span>
+        </li>
+        {% endif %}
+    </ul>
+</nav>
+{% endmacro %} 

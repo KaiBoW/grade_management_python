@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">{{ '编辑' if form.score.data else '添加' }}成绩</h5>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    {{ form.hidden_tag() }}
+                    <div class="mb-3">
+                        {{ form.student_id.label(class="form-label") }}
+                        {{ form.student_id(class="form-select") }}
+                    </div>
+                    <div class="mb-3">
+                        {{ form.subject_id.label(class="form-label") }}
+                        {{ form.subject_id(class="form-select") }}
+                    </div>
+                    <div class="mb-3">
+                        {{ form.score.label(class="form-label") }}
+                        {{ form.score(class="form-control") }}
+                        {% if form.score.errors %}
+                        <div class="invalid-feedback d-block">
+                            {% for error in form.score.errors %}
+                            <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                    </div>
+                    <div class="mb-3">
+                        {{ form.exam_date.label(class="form-label") }}
+                        {{ form.exam_date(class="form-control", type="date") }}
+                        {% if form.exam_date.errors %}
+                        <div class="invalid-feedback d-block">
+                            {% for error in form.exam_date.errors %}
+                            <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                    </div>
+                    {{ form.submit(class="btn btn-primary") }}
+                    <a href="{{ url_for('dashboard.scores') }}" class="btn btn-secondary">返回</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

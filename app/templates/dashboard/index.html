@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">学生总数</h5>
+                <p class="card-text display-4">{{ total_students }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">班级总数</h5>
+                <p class="card-text display-4">{{ total_classes }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">科目总数</h5>
+                <p class="card-text display-4">{{ total_subjects }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">最近成绩记录</h5>
+            </div>
+            <div class="card-body">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>学生</th>
+                            <th>科目</th>
+                            <th>分数</th>
+                            <th>考试日期</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for score in recent_scores %}
+                        <tr>
+                            <td>{{ score.student.name }}</td>
+                            <td>{{ score.subject.name }}</td>
+                            <td>{{ score.score }}</td>
+                            <td>{{ score.exam_date.strftime('%Y-%m-%d') }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

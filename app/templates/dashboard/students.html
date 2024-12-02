@@ -1,0 +1,79 @@
+{% from "macros.html" import render_pagination %}
+
+{% extends "base.html" %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">学生管理</h5>
+        <a href="{{ url_for('dashboard.add_student') }}" class="btn btn-primary btn-sm">添加学生</a>
+    </div>
+    <div class="card-body">
+        <div class="mb-3">
+            <form method="GET" class="row g-3">
+                <div class="col-auto">
+                    <select name="class_id" class="form-select" onchange="this.form.submit()">
+                        <option value="">所有班级</option>
+                        {% for class_ in classes %}
+                        <option value="{{ class_.id }}" {% if current_class == class_.id %}selected{% endif %}>
+                            {{ class_.name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </form>
+        </div>
+        
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>学号</th>
+                    <th>姓名</th>
+                    <th>性别</th>
+                    <th>班级</th>
+                    <th>出生日期</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for student in pagination.items %}
+                <tr>
+                    <td>{{ student.student_id }}</td>
+                    <td>{{ student.name }}</td>
+                    <td>{{ student.gender }}</td>
+                    <td>{{ student.class_.name }}</td>
+                    <td>{{ student.date_of_birth.strftime('%Y-%m-%d') }}</td>
+                    <td>
+                        <a href="{{ url_for('dashboard.edit_student', id=student.id) }}" 
+                           class="btn btn-sm btn-outline-primary">编辑</a>
+                        <button type="button" class="btn btn-sm btn-outline-danger"
+                                onclick="deleteStudent({{ student.id }})">删除</button>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        
+        {{ render_pagination(pagination, 'dashboard.students', class_id=current_class) }}
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function deleteStudent(id) {
+    if (confirm('确定要删除这个学生吗？相关的成绩记录也会被删除。')) {
+        fetch(`/dashboard/student/${id}/delete`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token() }}'
+            }
+        }).then(response => {
+            if (response.ok) {
+                window.location.reload();
+            }
+        });
+    }
+}
+</script>
+{% endblock %} 

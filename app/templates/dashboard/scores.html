@@ -1,0 +1,156 @@
+{% from "macros.html" import render_pagination %}
+
+{% extends "base.html" %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">成绩管理</h5>
+        <a href="{{ url_for('dashboard.add_score') }}" class="btn btn-primary btn-sm">添加成绩</a>
+    </div>
+    <div class="card-body">
+        <div class="mb-3">
+            <form method="GET" class="row g-3">
+                <div class="col-auto">
+                    <select name="class_id" class="form-select">
+                        <option value="">所有班级</option>
+                        {% for class_ in classes %}
+                        <option value="{{ class_.id }}" {% if current_class == class_.id %}selected{% endif %}>
+                            {{ class_.name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-auto">
+                    <select name="exam_date" class="form-select">
+                        <option value="">所有考试</option>
+                        {% for date in exam_dates %}
+                        <option value="{{ date.strftime('%Y-%m-%d') }}" 
+                                {% if current_exam_date and current_exam_date == date %}selected{% endif %}>
+                            {{ date.strftime('%Y-%m-%d') }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-auto">
+                    <button type="submit" class="btn btn-primary">筛选</button>
+                </div>
+            </form>
+        </div>
+        
+        <div class="table-responsive">
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>学号</th>
+                        <th>姓名</th>
+                        <th>班级</th>
+                        {% for subject in subjects %}
+                        <th>{{ subject.name }}</th>
+                        {% endfor %}
+                        <th>平均分</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for student in pagination.items %}
+                    <tr>
+                        <td>{{ student.student_id }}</td>
+                        <td>{{ student.name }}</td>
+                        <td>{{ student.class_.name }}</td>
+                        {% for subject in subjects %}
+                        <td>
+                            {% set score = score_dict.get((student.id, subject.id)) %}
+                            {% if score is not none %}
+                            {{ "%.1f"|format(score) }}
+                            {% else %}
+                            -
+                            {% endif %}
+                        </td>
+                        {% endfor %}
+                        <td>
+                            {% set total = namespace(sum=0, count=0) %}
+                            {% for subject in subjects %}
+                                {% set score = score_dict.get((student.id, subject.id)) %}
+                                {% if score is not none %}
+                                    {% set total.sum = total.sum + score %}
+                                    {% set total.count = total.count + 1 %}
+                                {% endif %}
+                            {% endfor %}
+                            {% if total.count > 0 %}
+                                {{ "%.1f"|format(total.sum / total.count) }}
+                            {% else %}
+                                -
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+                {% if pagination.items %}
+                <tfoot>
+                    <tr class="table-secondary">
+                        <td colspan="3">平均分</td>
+                        {% for subject in subjects %}
+                        <td>
+                            {% set total = namespace(sum=0, count=0) %}
+                            {% for student in pagination.items %}
+                                {% set score = score_dict.get((student.id, subject.id)) %}
+                                {% if score is not none %}
+                                    {% set total.sum = total.sum + score %}
+                                    {% set total.count = total.count + 1 %}
+                                {% endif %}
+                            {% endfor %}
+                            {% if total.count > 0 %}
+                                {{ "%.1f"|format(total.sum / total.count) }}
+                            {% else %}
+                                -
+                            {% endif %}
+                        </td>
+                        {% endfor %}
+                        <td>
+                            {% set total = namespace(sum=0, count=0) %}
+                            {% for student in pagination.items %}
+                                {% for subject in subjects %}
+                                    {% set score = score_dict.get((student.id, subject.id)) %}
+                                    {% if score is not none %}
+                                        {% set total.sum = total.sum + score %}
+                                        {% set total.count = total.count + 1 %}
+                                    {% endif %}
+                                {% endfor %}
+                            {% endfor %}
+                            {% if total.count > 0 %}
+                                {{ "%.1f"|format(total.sum / total.count) }}
+                            {% else %}
+                                -
+                            {% endif %}
+                        </td>
+                    </tr>
+                </tfoot>
+                {% endif %}
+            </table>
+        </div>
+        
+        {{ render_pagination(pagination, 'dashboard.scores', 
+                            class_id=current_class,
+                            exam_date=current_exam_date.strftime('%Y-%m-%d') if current_exam_date else none) }}
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function deleteScore(id) {
+    if (confirm('确定要删除这条成绩记录吗？')) {
+        fetch(`/dashboard/score/${id}/delete`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token() }}'
+            }
+        }).then(response => {
+            if (response.ok) {
+                window.location.reload();
+            }
+        });
+    }
+}
+</script>
+{% endblock %} 

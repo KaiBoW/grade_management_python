@@ -1,0 +1,62 @@
+{% from "macros.html" import render_pagination %}
+
+{% extends "base.html" %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">班级管理</h5>
+        <a href="{{ url_for('dashboard.add_class') }}" class="btn btn-primary btn-sm">添加班级</a>
+    </div>
+    <div class="card-body">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>班级名称</th>
+                    <th>年级</th>
+                    <th>学生数量</th>
+                    <th>创建时间</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for class_ in pagination.items %}
+                <tr>
+                    <td>{{ class_.name }}</td>
+                    <td>{{ class_.grade }}</td>
+                    <td>{{ class_.students.count() }}</td>
+                    <td>{{ class_.created_at.strftime('%Y-%m-%d') }}</td>
+                    <td>
+                        <a href="{{ url_for('dashboard.edit_class', id=class_.id) }}" 
+                           class="btn btn-sm btn-outline-primary">编辑</a>
+                        <button type="button" class="btn btn-sm btn-outline-danger"
+                                onclick="deleteClass({{ class_.id }})">删除</button>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        
+        {{ render_pagination(pagination, 'dashboard.classes') }}
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function deleteClass(id) {
+    if (confirm('确定要删除这个班级吗？')) {
+        fetch(`/dashboard/class/${id}/delete`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': window.csrf_token
+            }
+        }).then(response => {
+            if (response.ok) {
+                window.location.reload();
+            }
+        });
+    }
+}
+</script>
+{% endblock %} 
